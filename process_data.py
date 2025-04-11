@@ -32,11 +32,9 @@ def process_pcap(list_pcaps):
                   continue
 
              packet_obj = Packet(packet)
-             print(packet_obj.time)
              packets.append(packet_obj)
     
     sorted_packets = sorted(packets, key=attrgetter('time'))
-    print(sorted_packets[0].time, sorted_packets[-1].time)
     return sorted_packets
 
 
@@ -67,8 +65,7 @@ def get_flows(packets):
                 dataset.append(extract_features(flows[key]))
                 del flows[key]
 
-    print(dataset)
-
+    return dataset
 
 
 def extract_features(flow):
@@ -88,4 +85,6 @@ def extract_features(flow):
     feature_set.sleep_time = float(np.median(inter_arrival)) if len(inter_arrival) > 0 else 0
     feature_set.avg_entropy = float(np.mean(flow.entropy)) if flow.entropy else 0
 
-    return feature_set
+    print(feature_set.__dict__)
+
+    return feature_set.__dict__

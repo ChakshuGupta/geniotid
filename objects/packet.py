@@ -26,8 +26,8 @@ class Packet(object):
         # initialise packet time
         self.time = None
 
-        self.dns_queries = []
-        self.entropy = []
+        self.dns_queries = list()
+        self.entropy = list()
 
         if pkt is not None:
             # Extract the fields and set the values for the class variables
@@ -100,4 +100,5 @@ class Packet(object):
             second_level = domain_info.domain
             self.dns_queries.append(query.qname.decode("utf-8"))
             if second_level.strip() != "":
-                self.entropy.append(calculate_entropy(second_level))
+                entropy = calculate_entropy(second_level)
+                self.entropy.append(entropy)

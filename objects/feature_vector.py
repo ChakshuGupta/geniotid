@@ -1,4 +1,4 @@
-class FeatureVector:
+class FeatureVector(object):
 
     def __init__(self):
         """
