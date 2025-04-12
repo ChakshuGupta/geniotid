@@ -1,7 +1,10 @@
 import numpy as np
+import pandas as pd
+
 
 from operator import attrgetter
 from scapy.all import *
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 from objects.feature_vector import FeatureVector
 from objects.flow import Flow
@@ -38,7 +41,8 @@ def process_pcap(list_pcaps):
     return sorted_packets
 
 
-def get_flows(packets):
+def get_flows(packets, device):
+    tfidf = TfidfVectorizer()
     dataset = []
 
     flows = dict()
@@ -62,29 +66,34 @@ def get_flows(packets):
                     flows[key].add(packet)
             else:
                 # Else, extract the features and delete it from the flows list.
-                dataset.append(extract_features(flows[key]))
+                dataset.append(extract_features(flows[key], tfidf))
                 del flows[key]
 
-    return dataset
+    dataset_df = pd.DataFrame(dataset, columns=list(dataset[0].keys()))
+    dataset_df["label"] = device
+    print(dataset_df)
+    return dataset_df
 
 
-def extract_features(flow):
+def extract_features(flow, tfidf):
     """
     Extract features from the traffic flows.
     """
     feature_set = FeatureVector()
     feature_set.sport = flow.sport
     feature_set.dport = flow.dport
-    feature_set.tcp_flags = flow.tcp_flags
-    feature_set.entropy = flow.entropy
-    feature_set.dns_queries = flow.dns_queries
+    feature_set.tcp_flags = list(set(flow.tcp_flags))
+    if len(flow.dns_queries) != 0:
+        dns_queries = tfidf.fit_transform(list(set(flow.dns_queries)))
+        feature_set.dns_queries = dns_queries.toarray()[0]
+        print(feature_set.dns_queries)
+    else:
+        feature_set.dns_queries = []
 
     timestamps = sorted([float(t[0]) for t in flow.packets])
     inter_arrival = np.diff(timestamps) if len(timestamps) > 1 else [0]
-    feature_set.max_inter_arrival = max(inter_arrival) if len(inter_arrival) > 0 else 0
+    feature_set.max_inter_arrival_time = max(inter_arrival) if len(inter_arrival) > 0 else 0
     feature_set.sleep_time = float(np.median(inter_arrival)) if len(inter_arrival) > 0 else 0
     feature_set.avg_entropy = float(np.mean(flow.entropy)) if flow.entropy else 0
-
-    print(feature_set.__dict__)
 
     return feature_set.__dict__

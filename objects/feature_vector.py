@@ -8,7 +8,6 @@ class FeatureVector(object):
         self.dport = None
         self.tcp_flags = []
         self.dns_queries = []
-        self.entropy = []
         self.max_inter_arrival_time = 0
         self.sleep_time = 0
         self.avg_entropy = 0

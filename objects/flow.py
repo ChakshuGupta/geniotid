@@ -66,16 +66,11 @@ class Flow(object):
         # Add packet to the flow
         self.packets.append((pkt.time, pkt))
         
-        if len(self.dns_queries) != 0:
-            self.dns_queries.extend(pkt.dns_queries)
-        else:
-            self.dns_queries.append(None)
+        self.dns_queries.extend(pkt.dns_queries)
 
-        if len(pkt.entropy) != 0:
-            self.entropy.extend(pkt.entropy)
-        else:
-            self.entropy.append(0)
+        self.entropy.extend(pkt.entropy)
 
-        self.tcp_flags.append(pkt.tcp_flags)
+        if pkt.tcp_flags != None:
+            self.tcp_flags.append(pkt.tcp_flags)
 
         return self
