@@ -81,10 +81,10 @@ if __name__ == "__main__":
         y_train = dataset_y[train_index]
         x_test = dataset_x[test_index]
         y_test = dataset_y[test_index]
-        model = train_model(dataset_x, dataset_y)
+        model = train_model(x_train, y_train)
         save_model(model, idx)
 
-        y_pred, y_prob = test_model(model, x_test, y_test)
+        y_pred, y_prob = test_model(model, x_test)
 
         y_true_all.extend(y_test)
         y_pred_all.extend(y_pred)

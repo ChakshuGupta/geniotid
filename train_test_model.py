@@ -21,8 +21,9 @@ def save_model(model, idx, outputdir = "."):
     pickle.dump(model, open(model_file, 'wb'))
 
 
-def test_model(model, x_test, y_test):
+def test_model(model, x_test):
     y_pred = model.predict(x_test)
-    y_prob = model.predict_proba(x_test)
+    probs = model.predict_proba(x_test)
+    y_prob = np.amax(probs, axis=1)
 
     return y_pred, y_prob
