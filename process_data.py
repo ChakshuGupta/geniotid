@@ -68,11 +68,21 @@ def get_flows(packets, device):
                 # Else, extract the features and delete it from the flows list.
                 dataset.append(extract_features(flows[key], tfidf))
                 del flows[key]
-
-    dataset_df = pd.DataFrame(dataset, columns=list(dataset[0].keys()))
-    dataset_df["label"] = device
-    print(dataset_df)
-    return dataset_df
+    
+    print(len(dataset))
+    if len(dataset) > 0:
+        dataset_df = pd.DataFrame(dataset, columns=list(dataset[0].keys()))
+        dataset_df["label"] = device
+        return dataset_df
+    else:
+        if len(flows) > 0:
+            for key in flows.keys():
+                dataset.append(extract_features(flows[key], tfidf))
+            dataset_df = pd.DataFrame(dataset, columns=list(dataset[0].keys()))
+            dataset_df["label"] = device
+            return dataset_df
+        else:
+            return
 
 
 def extract_features(flow, tfidf):
@@ -86,7 +96,6 @@ def extract_features(flow, tfidf):
     if len(flow.dns_queries) != 0:
         dns_queries = tfidf.fit_transform(list(set(flow.dns_queries)))
         feature_set.dns_queries = dns_queries.toarray()[0]
-        print(feature_set.dns_queries)
     else:
         feature_set.dns_queries = []
 
