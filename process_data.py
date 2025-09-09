@@ -24,7 +24,7 @@ def process_pcap(list_pcaps):
         capture = rdpcap(pcap_file)
 
         if not capture:
-                raise ValueError("No packets found in the pcap file: ", pcap_file)
+            raise ValueError("No packets found in the pcap file: ", pcap_file)
         
         for packet in capture:
              
@@ -48,26 +48,26 @@ def get_flows(packets, device):
     flows = dict()
 
     for packet in packets:                 
-            flow_key = (packet.sip, packet.dip, packet.sport, packet.dport, packet.proto)
-            reverse_key = (packet.dip, packet.sip, packet.dport, packet.sport, packet.proto)
-            key = flow_key
-            
-            # Check if the flow exists in the flows dictionary
-            if flow_key not in flows and reverse_key not in flows:
-                flows[flow_key] = Flow()
-                flows[flow_key].time_start = packet.time
-            elif flow_key in flows:
-                key = flow_key                   
-            else:
-                key = reverse_key
-            
-            # If the packets are within the time window, add to the flow
-            if packet.time - flows[key].time_start <= TIME_WINDOW:
-                    flows[key].add(packet)
-            else:
-                # Else, extract the features and delete it from the flows list.
-                dataset.append(extract_features(flows[key], tfidf))
-                del flows[key]
+        flow_key = (packet.sip, packet.dip, packet.sport, packet.dport, packet.proto)
+        reverse_key = (packet.dip, packet.sip, packet.dport, packet.sport, packet.proto)
+        key = flow_key
+        
+        # Check if the flow exists in the flows dictionary
+        if flow_key not in flows and reverse_key not in flows:
+            flows[flow_key] = Flow()
+            flows[flow_key].time_start = packet.time
+        elif flow_key in flows:
+            key = flow_key                   
+        else:
+            key = reverse_key
+        
+        # If the packets are within the time window, add to the flow
+        if packet.time - flows[key].time_start <= TIME_WINDOW:
+                flows[key].add(packet)
+        else:
+            # Else, extract the features and delete it from the flows list.
+            dataset.append(extract_features(flows[key], tfidf))
+            del flows[key]
     
     print(len(dataset))
     if len(dataset) > 0:
